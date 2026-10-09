@@ -1,0 +1,16 @@
+name: Feature request
+description: Generic plumbing that almost every hackathon demo would want
+labels: ["type:feature"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What breaks or slows down a demo without it?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+    validations:
+      required: true

@@ -1,4 +1,14 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.png">
+  <img src="docs/assets/banner-light.png" width="100%" alt="hackathon-starter banner. Text: A hackathon demo that cannot break on stage. Beside it, a conference badge on a lanyard reads hackathon-starter, Next.js and FastAPI template; demo mode, record-and-replay fallbacks and a smoke test on the demo path; role DEMO SAFE.">
+</picture>
+
 # hackathon-starter
+
+[![CI status of the main branch](https://github.com/Coflazo/hackathon-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/Coflazo/hackathon-starter/actions/workflows/ci.yml)
+[![CodeQL status](https://github.com/Coflazo/hackathon-starter/actions/workflows/codeql.yml/badge.svg)](https://github.com/Coflazo/hackathon-starter/actions/workflows/codeql.yml)
+![License: MIT](https://img.shields.io/badge/license-MIT-16a34a)
+![Next.js 16 and FastAPI](https://img.shields.io/badge/stack-Next.js%2016%20%2B%20FastAPI-131416)
 
 Generic plumbing for a hackathon demo that cannot break on stage: a demo-mode switch,
 record-and-replay fallbacks for every external call, and one smoke test that walks the demo path.
@@ -8,7 +18,7 @@ and say so in your submission.
 ## What is in it
 
 | Part | What it does |
-|---|---|
+| --- | --- |
 | `web/` | Next.js 16 app with one demo page, an API route, and `lib/replay.ts` + `lib/llm.ts` |
 | `api/` | FastAPI twin with `replay.py` and the same demo endpoint |
 | `fixtures/` (both) | Recorded answers the demo falls back to; the sample answer is labelled "Sample data" on screen |
@@ -19,7 +29,7 @@ and say so in your submission.
 ## How the fallback works
 
 | Setting | Behaviour |
-|---|---|
+| --- | --- |
 | `DEMO_MODE=1` | Every call answers from `fixtures/<key>.json`; the demo is identical each run |
 | `RECORD=1` | Calls go live and the answers are saved as fixtures |
 | neither | Live call with a timeout; on failure, the fixture; with no fixture, a clear error state |
@@ -48,11 +58,16 @@ Need components? `npx shadcn@latest init` inside `web/` adds Tailwind and shadcn
 ## What is proven
 
 | Claim | Verdict | Evidence |
-|---|---|---|
+| --- | --- | --- |
 | The web demo path works offline in demo mode | Proven | `e2e/demo-path.spec.ts`, 2 tests pass |
 | The API demo path works offline, fails clearly without a fixture, rate-limits, refuses path-like fixture keys | Proven | `api/test_smoke.py`, 5 tests pass |
 | Live LLM calls fall back to the second provider | Not yet tested | Covered by code review only |
 
+## Contributing and security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and the
+[Code of Conduct](CODE_OF_CONDUCT.md). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
-MIT
+[MIT](LICENSE)
