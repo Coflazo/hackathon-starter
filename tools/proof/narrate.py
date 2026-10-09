@@ -74,7 +74,7 @@ def build() -> None:
     for i, (s, c) in enumerate(zip(steps, clips, strict=True), 1):
         at = int(s["start"] * RATE)
         track[at : at + len(c)] += c
-        srt.append(f"{i}\n{ts(s['start'])} --> {ts(s['start'] + len(c) / RATE)}\n{s['caption'] or s['say']}\n")
+        srt.append(f"{i}\n{ts(s['start'])} --> {ts(s['start'] + len(c) / RATE)}\n{s['say']}\n")
     write_wav(OUT / "narration.wav", track)
     (OUT / "captions.srt").write_text("\n".join(srt))
     print(f"narration {total:.1f}s -> {OUT}/narration.wav, {OUT}/captions.srt")

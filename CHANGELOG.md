@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Proof kit captions now show the spoken narration, not the short step label: deaf and muted
+  viewers, and a video panel reading the transcript, saw only a few words per step.
+
 ### Added
 
 - Proof kit (`tools/proof/`): records the demo path through a DevTools screencast, narrates it with
