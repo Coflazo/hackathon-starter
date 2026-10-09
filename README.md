@@ -55,6 +55,28 @@ DEMO_MODE=1 .venv/bin/uvicorn main:app --reload  # http://localhost:8000/docs
 
 Need components? `npx shadcn@latest init` inside `web/` adds Tailwind and shadcn/ui.
 
+## Proof kit: video, GIF, screenshots and a claims table from one command list
+
+Judges trust what they can see working. `tools/proof/` turns the demo path into evidence, with no
+paid tools: a narrated MP4 with captions, a GIF, one screenshot per step and a "what is proven" table
+built from real test results.
+
+```bash
+cd web && npm run build && DEMO_MODE=1 npx next start -p 3100 &        # the app, in demo mode
+export PROOF_DIR=$PWD/proof
+python3 tools/proof/narrate.py prepare --silent tools/proof/demo-path.json   # or Kokoro, below
+(cd web && node ../tools/proof/record.mjs ../tools/proof/demo-path.json)    # headless Chrome screencast
+python3 tools/proof/narrate.py build && sh tools/proof/mux.sh proof          # demo.mp4 and demo.gif
+python3 tools/proof/check_video.py                                          # length, wow by 10 s, captions, sponsors
+python3 tools/proof/proof_table.py tools/proof/claims.json                  # claims backed by tests
+```
+
+Describe the flow once in `tools/proof/demo-path.json`: each step has an action, the narration line
+and a caption, and one step is marked `"wow": true`. For a spoken voice instead of silence, run
+`narrate.py prepare` with the Kokoro-82M venv (offline, voice `bm_lewis`). The recorder uses Chrome's
+DevTools screencast because Playwright's own video recorder does not run on macOS 13. CI builds the
+video on every push and uploads it with the GIF, screenshots and claims table as the `proof` artifact.
+
 ## What is proven
 
 | Claim | Verdict | Evidence |

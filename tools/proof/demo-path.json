@@ -1,0 +1,12 @@
+{
+  "base_url": "http://127.0.0.1:3100",
+  "viewport": [1280, 720],
+  "sponsors": [],
+  "steps": [
+    {"action": "goto", "url": "/", "say": "This is the demo path: one flow, start to finish.", "caption": "The demo path"},
+    {"action": "fill", "label": "Input", "value": "What does this app do?", "say": "We ask it a question.", "caption": "Ask a question"},
+    {"action": "click", "role": "button", "name": "Run", "wait_for_testid": "output", "wow": true,
+     "say": "One click, and the answer comes back, even with no network, from a recorded fixture.", "caption": "The answer, offline"},
+    {"action": "pause", "ms": 1500, "say": "Sample data is labelled on screen, so nothing is passed off as live.", "caption": "Sample data is labelled"}
+  ]
+}

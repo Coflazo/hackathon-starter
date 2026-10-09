@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Proof kit (`tools/proof/`): records the demo path through a DevTools screencast, narrates it with
+  local Kokoro TTS or silent timing, muxes a captioned MP4 and a GIF, checks the video (length, wow
+  by 10 s, captions, sponsors named) and builds the "what is proven" table from test results. CI runs
+  it and uploads the `proof` artifact.
+
 ### Changed
 
 - TypeScript 5.9.3 to 7.0.2 in `web/` (the native compiler); `next build` and the smoke test pass.
