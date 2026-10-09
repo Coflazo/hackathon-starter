@@ -10,7 +10,7 @@ import os
 import time
 from collections import defaultdict
 
-import httpx
+import httpx2
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
@@ -46,7 +46,7 @@ def chat(prompt: str) -> str:
     last: Exception = RuntimeError("no LLM provider configured")
     for base, key, model in _providers():
         try:
-            r = httpx.post(f"{base}/chat/completions", timeout=8,
+            r = httpx2.post(f"{base}/chat/completions", timeout=8,
                            headers={"Authorization": f"Bearer {key}"},
                            json={"model": model, "messages": [{"role": "user", "content": prompt}]})
             r.raise_for_status()
