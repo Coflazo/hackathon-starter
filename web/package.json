@@ -1,0 +1,21 @@
+{
+  "name": "hackathon-starter-web",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@types/node": "26.6.4",
+    "@types/react": "19.3.0",
+    "typescript": "5.9.3"
+  }
+}
