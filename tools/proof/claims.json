@@ -1,0 +1,27 @@
+[
+  {
+    "claim": "The web demo path works offline in demo mode",
+    "tests": [
+      "demo path answers from the fixture"
+    ]
+  },
+  {
+    "claim": "Empty input is rejected with a clear error",
+    "tests": [
+      "empty input is rejected"
+    ]
+  },
+  {
+    "claim": "The API demo path works offline and fails clearly without a fixture",
+    "tests": [
+      "test_demo_path_answers_from_fixture",
+      "test_live_failure_without_fixture_is_a_clear_error"
+    ]
+  },
+  {
+    "claim": "Live LLM calls fall back to the second provider",
+    "tests": [
+      "fallback provider"
+    ]
+  }
+]
