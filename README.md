@@ -72,7 +72,8 @@ python3 tools/proof/proof_table.py tools/proof/claims.json                  # cl
 ```
 
 Describe the flow once in `tools/proof/demo-path.json`: each step has an action, the narration line
-and a caption, and one step is marked `"wow": true`. For a spoken voice instead of silence, run
+(`say`, which is also the step's caption in the video) and a short label (`caption`), and one step
+is marked `"wow": true`. For a spoken voice instead of silence, run
 `narrate.py prepare` with the Kokoro-82M venv (offline, voice `bm_lewis`). The recorder uses Chrome's
 DevTools screencast because Playwright's own video recorder does not run on macOS 13. CI builds the
 video on every push and uploads it with the GIF, screenshots and claims table as the `proof` artifact.
