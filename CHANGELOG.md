@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- TypeScript 5.9.3 to 7.0.2 in `web/` (the native compiler); `next build` and the smoke test pass.
+
 ## [1.0.0] - 2026-10-09
 
 ### Added
