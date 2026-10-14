@@ -38,6 +38,7 @@ for (const [i, s] of spec.steps.entries()) {
   if (s.action === "goto") await page.goto(new URL(s.url, spec.base_url).toString());
   if (s.action === "fill") await page.getByLabel(s.label).fill(s.value);
   if (s.action === "click") await page.getByRole(s.role, { name: s.name }).click();
+  if (s.action === "scroll") await page.getByTestId(s.testid).scrollIntoViewIfNeeded();
   if (s.wait_for_testid) await page.getByTestId(s.wait_for_testid).waitFor({ timeout: 30_000 });
   if (s.action === "pause") await page.waitForTimeout(s.ms);
   const said = durations[i] ? durations[i] * 1000 + 400 : 0;
