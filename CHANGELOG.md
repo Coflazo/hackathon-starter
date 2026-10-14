@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Proof kit `scroll` action: brings an element (by `data-testid`) into view, so a long report
+  page can be walked beat by beat instead of holding one static frame.
+
 ### Fixed
 
 - Proof kit captions now show the spoken narration, not the short step label: deaf and muted

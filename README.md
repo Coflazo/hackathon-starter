@@ -71,7 +71,8 @@ python3 tools/proof/check_video.py                                          # le
 python3 tools/proof/proof_table.py tools/proof/claims.json                  # claims backed by tests
 ```
 
-Describe the flow once in `tools/proof/demo-path.json`: each step has an action, the narration line
+Describe the flow once in `tools/proof/demo-path.json`: each step has an action (`goto`, `fill`,
+`click`, `scroll` to a `testid`, `pause`), the narration line
 (`say`, which is also the step's caption in the video) and a short label (`caption`), and one step
 is marked `"wow": true`. For a spoken voice instead of silence, run
 `narrate.py prepare` with the Kokoro-82M venv (offline, voice `bm_lewis`). The recorder uses Chrome's
