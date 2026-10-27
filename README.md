@@ -61,21 +61,35 @@ Judges trust what they can see working. `tools/proof/` turns the demo path into 
 paid tools: a narrated MP4 with captions, a GIF, one screenshot per step and a "what is proven" table
 built from real test results.
 
+One command runs all of it, from the repo root (`PYTHON` is a Python with `api/requirements.txt`):
+
+```bash
+PYTHON=api/.venv/bin/python VIDEO_LIMIT=120 sh tools/proof/run.sh
+```
+
+The same steps by hand:
+
 ```bash
 cd web && npm run build && DEMO_MODE=1 npx next start -p 3100 &        # the app, in demo mode
 export PROOF_DIR=$PWD/proof
 python3 tools/proof/narrate.py prepare --silent tools/proof/demo-path.json   # or Kokoro, below
 (cd web && node ../tools/proof/record.mjs ../tools/proof/demo-path.json)    # headless Chrome screencast
 python3 tools/proof/narrate.py build && sh tools/proof/mux.sh proof          # demo.mp4 and demo.gif
-python3 tools/proof/check_video.py                                          # length, wow by 10 s, captions, sponsors
+python3 tools/proof/check_video.py                                          # length, wow by 10 s, captions, sponsors, repeated frames
 python3 tools/proof/proof_table.py tools/proof/claims.json                  # claims backed by tests
 ```
 
 Describe the flow once in `tools/proof/demo-path.json`: each step has an action (`goto`, `fill`,
-`click`, `scroll` to a `testid`, `pause`), the narration line
+`select`, `click`, `scroll` to a `testid`, `pause`), an optional `focus_testid` to bring the part
+of the page the step changed into view, the narration line
 (`say`, which is also the step's caption in the video) and a short label (`caption`), and one step
 is marked `"wow": true`. For a spoken voice instead of silence, run
-`narrate.py prepare` with the Kokoro-82M venv (offline, voice `bm_lewis`). The recorder uses Chrome's
+`narrate.py prepare` with the Kokoro-82M venv (offline, voice `bm_lewis`). Each beat outlines what
+it narrates and a click shows a dot where it lands, so beats on one page still look different; a
+top-level `setup` (`url`, `wait_for_testid`) loads a slow page before filming starts, and
+`PROOF_CHROME_ARGS="--use-angle=swiftshader"` renders WebGL headless. The browser runs in the
+`en-US` locale, so number fields never film as "7,76". `check_video.py` fails when two step
+screenshots look the same (SSIM 0.995 or more): merge those beats or change the picture. The recorder uses Chrome's
 DevTools screencast because Playwright's own video recorder does not run on macOS 13. CI builds the
 video on every push and uploads it with the GIF, screenshots and claims table as the `proof` artifact.
 
