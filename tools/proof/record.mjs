@@ -14,8 +14,10 @@ mkdirSync(`${out}/shots`, { recursive: true });
 // narrate.py prepare writes the length of each spoken line, so each step is held until its line ends
 const durations = existsSync(`${out}/durations.json`) ? JSON.parse(readFileSync(`${out}/durations.json`, "utf8")) : [];
 
-const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || undefined });
-const context = await browser.newContext({ viewport: { width, height } });
+// PROOF_CHROME_ARGS, for example "--use-angle=swiftshader", renders WebGL pages headless.
+const args = (process.env.PROOF_CHROME_ARGS || "").split(" ").filter(Boolean);
+const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || undefined, args });
+const context = await browser.newContext({ viewport: { width, height }, locale: "en-US" });
 const page = await context.newPage();
 
 // Chrome DevTools screencast instead of Playwright's recordVideo: its ffmpeg does not run on macOS 13.
@@ -29,17 +31,82 @@ cdp.on("Page.screencastFrame", async ({ data, metadata, sessionId }) => {
   frames.push({ file, at: Date.now() });
   await cdp.send("Page.screencastFrameAck", { sessionId }).catch(() => {});
 });
+// An optional setup loads the page before filming, so a slow first load is not the video's first seconds.
+if (spec.setup) {
+  await page.goto(new URL(spec.setup.url, spec.base_url).toString());
+  if (spec.setup.wait_for_testid) await page.getByTestId(spec.setup.wait_for_testid).waitFor({ timeout: 120_000 });
+  await page.waitForTimeout(spec.setup.settle_ms ?? 1500);
+}
 await cdp.send("Page.startScreencast", { format: "jpeg", quality: 85, maxWidth: width, maxHeight: height });
 const t0 = Date.now();
 const timeline = [];
 
+// Show the viewer what each beat is about: an outline on the element a step scrolls to or fills, and a
+// dot where a click lands. Without them, a short page gives near-identical frames for different beats.
+const MARK = "3px solid #f59e0b";
+async function mark(locator) {
+  await page.evaluate(() => {
+    for (const n of document.querySelectorAll("[data-proof-mark]")) {
+      n.style.outline = "";
+      n.removeAttribute("data-proof-mark");
+    }
+    document.getElementById("proof-cursor")?.remove();
+  });
+  if (!locator) return;
+  await locator.evaluate((el, outline) => {
+    el.setAttribute("data-proof-mark", "1");
+    el.style.outline = outline;
+    el.style.outlineOffset = "4px";
+  }, MARK);
+}
+async function dot(locator) {
+  const box = await locator.boundingBox();
+  if (!box) return;
+  await page.evaluate(({ x, y }) => {
+    const d = document.createElement("div");
+    d.id = "proof-cursor";
+    Object.assign(d.style, {
+      position: "fixed", left: `${x}px`, top: `${y}px`, width: "22px", height: "22px", borderRadius: "50%",
+      background: "rgba(245, 158, 11, 0.55)", border: "2px solid #b45309", transform: "translate(-50%, -50%)",
+      zIndex: "99999", pointerEvents: "none",
+    });
+    document.body.appendChild(d);
+  }, { x: box.x + box.width / 2, y: box.y + box.height / 2 });
+}
+
 for (const [i, s] of spec.steps.entries()) {
   const start = (Date.now() - t0) / 1000;
   if (s.action === "goto") await page.goto(new URL(s.url, spec.base_url).toString());
-  if (s.action === "fill") await page.getByLabel(s.label).fill(s.value);
-  if (s.action === "click") await page.getByRole(s.role, { name: s.name }).click();
-  if (s.action === "scroll") await page.getByTestId(s.testid).scrollIntoViewIfNeeded();
+  if (s.action === "fill") {
+    const field = page.getByLabel(s.label);
+    await field.fill(s.value);
+    await mark(field);
+  }
+  if (s.action === "select") {
+    const field = page.getByLabel(s.label);
+    await field.selectOption(s.value);
+    await mark(field);
+  }
+  if (s.action === "click") {
+    const target = page.getByRole(s.role, { name: s.name });
+    await mark(null);
+    await dot(target);
+    await page.waitForTimeout(500); // the video shows the press; the end-of-beat frame shows the result
+    await target.click();
+    await mark(null);
+  }
+  if (s.action === "scroll") {
+    const target = page.getByTestId(s.testid);
+    await target.scrollIntoViewIfNeeded();
+    await mark(target);
+  }
   if (s.wait_for_testid) await page.getByTestId(s.wait_for_testid).waitFor({ timeout: 30_000 });
+  // focus_testid: after the action, bring the part of the page it changed into view and outline it.
+  if (s.focus_testid) {
+    const focus = page.getByTestId(s.focus_testid);
+    await focus.scrollIntoViewIfNeeded();
+    await mark(focus);
+  }
   if (s.action === "pause") await page.waitForTimeout(s.ms);
   const said = durations[i] ? durations[i] * 1000 + 400 : 0;
   const spent = Date.now() - t0 - start * 1000;

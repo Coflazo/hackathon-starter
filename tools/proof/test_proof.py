@@ -36,3 +36,14 @@ def test_video_checklist(tmp_path, monkeypatch):
     assert any("wow starts at 12.0s" in p for p in problems)
     assert problems[-1] == "sponsor Globex is never named"
     assert not any("stream" in p for p in problems)
+
+
+@pytest.mark.skipif(not shutil.which("ffmpeg"), reason="needs ffmpeg")
+def test_repeated_frames_flags_only_the_same_picture(tmp_path):
+    def shot(name, colour):
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-f", "lavfi", "-i", f"color=c={colour}:s=320x180",
+                        "-frames:v", "1", str(tmp_path / name)], check=True)
+    for name, colour in (("01.png", "white"), ("02.png", "white"), ("03.png", "navy")):
+        shot(name, colour)
+    found = check_video.repeated_frames(sorted(tmp_path.glob("*.png")))
+    assert len(found) == 1 and found[0].startswith("steps 01 and 02 look the same")

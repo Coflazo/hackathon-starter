@@ -8,6 +8,18 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- Proof kit, from build drills 10 and 11: `tools/proof/run.sh` runs the whole kit in one command
+  and stops the server on any failure; the recorder outlines what each beat narrates, shows a dot
+  where a click lands, adds a `select` action, `focus_testid`, a `setup` page load and
+  `PROOF_CHROME_ARGS`, and runs in the `en-US` locale; `check_video.py` fails on two step
+  screenshots that look the same (SSIM 0.995 or more, calibrated on drill 11's video panels).
+
+### Changed
+
+- Next.js 16.4.0 to 16.4.3 (security advisory on 16.4.0).
+- The template's demo path merges the "sample data" beat into the wow step: its frame repeated
+  the previous one (SSIM 0.996), which the new check catches.
+
 - Proof kit `scroll` action: brings an element (by `data-testid`) into view, so a long report
   page can be walked beat by beat instead of holding one static frame.
 
